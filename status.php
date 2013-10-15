@@ -28,7 +28,7 @@ foreach ( $projects AS $project )
 {
 	foreach ( $envs AS $env )
 	{
-		$job_name = "$project-$env";
+		$job_name = "$project-$env"; //edit this for job name format
 
 		//get the latest build number
 		$build_json = file_get_contents( "$jenkins_url/job/$job_name/api/json?pretty=true", false, $context );
