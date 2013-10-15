@@ -1,0 +1,146 @@
+
+<html>
+<head>
+<title>Jenkins Build Status Board</title>
+<style>
+body {
+	background: black;
+	color: white;
+	margin:0;
+	padding:0;
+	font-family: helvetica;
+	position: relative;
+}
+
+.status {
+	text-align: center;
+	float:left;
+	width:25%;
+	padding:5px 5px;
+	margin:5px 5px 10px 0;
+}
+.success { background-color: #008B00; }
+.failure { background-color: #FF3030; }
+.aborted { background-color: #858585; }
+.wrapper {
+	clear:both;
+	border-bottom: 1px dotted #999;
+}
+.project {
+	text-align:right;
+	width:15%;
+	padding-right:10px;
+	float:left;
+	font-size: 24px;
+}
+.env { float:left; }
+.date { float:right;padding-top:2px; font-size: 12px; color:#fefefe; }
+#lastupdate {
+	color:#fff;
+	clear:both;
+	text-align: center;
+	font-size:12px;
+	font-family: helvetica;
+}
+
+</style>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script>
+var failure = true;
+</script>
+</head>
+<body>
+<div id="lastupdate">Last updated: 10/15/2013 10:37:40 am</div>
+	<div class="wrapper">
+	<div class='project'>project1</div>
+					<div class="status aborted">
+					<div class='env'>PROD #63</div>
+					<div class='date'>10/15/2013 @ 9:16:59 am</div>
+				</div>
+
+
+							<div class="status success">
+					<div class='env'>QA #70</div>
+					<div class='date'>10/15/2013 @ 9:16:29 am</div>
+				</div>
+
+
+							<div class="status success">
+					<div class='env'>TRUNK #75</div>
+					<div class='date'>10/15/2013 @ 9:15:15 am</div>
+				</div>
+
+
+				</div>
+		<div class="wrapper">
+	<div class='project'>project2</div>
+					<div class="status success">
+					<div class='env'>PROD #319</div>
+					<div class='date'>10/15/2013 @ 9:08:38 am</div>
+				</div>
+
+
+							<div class="status success">
+					<div class='env'>QA #330</div>
+					<div class='date'>10/15/2013 @ 9:07:46 am</div>
+				</div>
+
+
+							<div class="status success">
+					<div class='env'>TRUNK #447</div>
+					<div class='date'>10/15/2013 @ 10:19:41 am</div>
+				</div>
+
+
+				</div>
+		<div class="wrapper">
+	<div class='project'>project3</div>
+					<div class="status success">
+					<div class='env'>PROD #7</div>
+					<div class='date'>10/15/2013 @ 9:34:35 am</div>
+				</div>
+
+
+							<div class="status failure">
+					<div class='env'>QA #12</div>
+					<div class='date'>10/15/2013 @ 9:11:11 am</div>
+				</div>
+
+
+							<div class="status success">
+					<div class='env'>TRUNK #93</div>
+					<div class='date'>10/15/2013 @ 9:11:00 am</div>
+				</div>
+
+
+				</div>
+		<div class="wrapper">
+	<div class='project'>project4</div>
+					<div class="status success">
+					<div class='env'>PROD #53</div>
+					<div class='date'>10/15/2013 @ 9:10:29 am</div>
+				</div>
+
+
+							<div class="status success">
+					<div class='env'>QA #76</div>
+					<div class='date'>10/15/2013 @ 9:09:46 am</div>
+				</div>
+
+
+							<div class="status success">
+					<div class='env'>TRUNK #104</div>
+					<div class='date'>10/15/2013 @ 9:09:11 am</div>
+				</div>
+
+
+				</div>
+<script>
+if ( failure )
+{
+	setInterval("$('body').animate( {'background-color':'#FF3030'}, 1500 ).animate( {'background-color':'#000'}, 1500 );",3000);
+}
+</script>
+</body>
+</html>
