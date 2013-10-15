@@ -17,10 +17,10 @@
 	</style>
 </head>
 <body>
-<iframe id="status" src="/status/status.php" width="100%" height="100%"></iframe>
+<iframe id="status" src="status.php" width="100%" height="100%"></iframe>
 <script>
 setInterval(function(){
-	document.getElementById("status").src="/status/status.php";
+	document.getElementById("status").src="status.php";
 }, 300000);
 </script>
 </body>
