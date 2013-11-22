@@ -1,5 +1,5 @@
-JenkinsStatusBoard
-==================
+Jenkins Status Board
+====================
 
 An external status board for Jenkins Build statuses that can be used on dashboard apps that don't allow you to sign into Jenkins.
 
