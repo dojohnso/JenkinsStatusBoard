@@ -1,6 +1,5 @@
 <html>
 <head>
-	<title>Jenkins Dashboard</title>
 	<style>
 	body {
 		padding:0;
