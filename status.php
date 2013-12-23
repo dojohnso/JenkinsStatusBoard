@@ -2,8 +2,7 @@
 
 $username = 'your_jenkins_readonly_username';
 $password = 'your_jenkins_readonly_password';
-$jenkins_url = 'your_jenkins_url';
-
+$jenkins_url = 'http://your_jenkins_url';
 
 $context = stream_context_create(array(
     'http' => array(
@@ -11,43 +10,34 @@ $context = stream_context_create(array(
     )
 ));
 
-$projects = array(
-	'list-of',
-	'full-project-names',
-	'you-want-to',
-	'keep-track-of',
-);
+// get all jobs
+$projects = file_get_contents( "$jenkins_url/api/json?pretty=true", false, $context );
+$projects = json_decode( $projects );
+$jobs = $projects->jobs;
 
-$envs = array(
-	'prod',
-	'qa',
-	'trunk',
-);
 $stati = array();
-foreach ( $projects AS $project )
+foreach ( $jobs AS $job )
 {
-	foreach ( $envs AS $env )
-	{
-		$job_name = "$project-$env"; //edit this for job name format
+	//get the latest build number
+	$build_json = @file_get_contents( "{$job->url}api/json?pretty=true", false, $context );
 
-		//get the latest build number
-		$build_json = file_get_contents( "$jenkins_url/job/$job_name/api/json?pretty=true", false, $context );
-		$build_info = json_decode( $build_json );
+	$build_info = json_decode( $build_json );
 
-		$name = $build_info->displayName;
-		$build = $build_info->builds[0]->number;
+	$build = $build_info->builds[0]->number;
 
-		//check the latest status
-		$job_json = file_get_contents( "$jenkins_url/job/$job_name/$build/api/json?pretty=true", false, $context );
-		$job_info = json_decode( $job_json );
+	//check the latest status
+	$job_json = @file_get_contents( "{$job->url}$build/api/json?pretty=true", false, $context );
+	$job_info = json_decode( $job_json );
 
-		$stati[$project][$env][$build]['result'] = strtolower( $job_info->result );
-		$stati[$project][$env][$build]['date'] = date( 'm/d/Y @ g:i:s a', substr( $job_info->timestamp, 0, -3 ) );
-	}
+	$job_info->timestamp = !empty( $job_info->timestamp ) ? substr( $job_info->timestamp, 0, -3 ) : null;
+
+	$stati[$job->name][$build]['result'] = strtolower( $job_info->result );
+	$stati[$job->name][$build]['date'] = empty( $job_info->timestamp ) ? 'n/a' : date( 'n-j H:i:s', $job_info->timestamp );
+	$stati[$job->name][$build]['timestamp'] = $job_info->timestamp;
 }
 ?><html>
 <head>
-<title>Jenkins Build Status Board</title>
+<title>Build Status Board</title>
 <style>
 body {
 	background: black;
@@ -60,27 +50,18 @@ body {
 
 .status {
 	text-align: center;
+	position:relative;
+	color:#fefefe;
 	float:left;
-	width:25%;
-	padding:5px 5px;
+	width:auto;
+	overflow:hidden;
+	padding:10px;
+	background-color: #858585;
 	margin:5px 5px 10px 0;
 }
 .success { background-color: #008B00; }
 .failure { background-color: #FF3030; }
 .aborted { background-color: #858585; }
-.wrapper {
-	clear:both;
-	border-bottom: 1px dotted #999;
-}
-.project {
-	text-align:right;
-	width:15%;
-	padding-right:10px;
-	float:left;
-	font-size: 24px;
-}
-.env { float:left; }
-.date { float:right;padding-top:2px; font-size: 12px; color:#fefefe; }
 #lastupdate {
 	color:#fff;
 	clear:both;
@@ -90,49 +71,29 @@ body {
 }
 
 </style>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-<script>
-var failure = false;
-</script>
 </head>
 <body>
-<div id="lastupdate">Last updated: <?php echo date('m/d/Y g:i:s a') ?></div>
+<div id="lastupdate">Last updated: <?php echo date('m/d/Y g:i:s a') ?> in <?php echo time() - $t; ?> seconds</div>
 <?php
 foreach ( $stati AS $project => $project_info )
 {
-	?>
-	<div class="wrapper">
-	<div class='project'><?php echo $project; ?></div>
-	<?php
-	foreach ( $project_info AS $env => $env_info )
+	foreach ( $project_info AS $build => $status )
 	{
-		foreach ( $env_info AS $build => $status )
-		{
-			?>
-			<div class="status <?php echo $status['result']; ?>">
-				<div class='env'><?php echo strtoupper( $env ); ?> #<?php echo $build; ?></div>
-				<div class='date'><?php echo $status['date']; ?></div>
-			</div>
-
-			<?php if ($status['result'] == 'failure') { ?>
-				<script>
-				failure = true;
-				</script>
-			<?php }
+		$proj = '';
+		$words = preg_split("/[^A-Za-z0-9]/", $project);
+		foreach ($words as $w) {
+			$proj .= $w[0];
 		}
+		?>
+			<div class="status <?php echo $status['result']; ?>">
+				<div class='project'>
+					<?php echo strtoupper( $proj ); ?>
+				</div>
+			</div>
+		<?php
 	}
-	?>
-	</div>
-	<?php
 }
 ?>
 
-<script>
-if ( failure )
-{
-	setInterval("$('body').animate( {'background-color':'#FF3030'}, 1500 ).animate( {'background-color':'#000'}, 1500 );",3000);
-}
-</script>
 </body>
 </html>
